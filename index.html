@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAK.Team - 无限进步</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #1d1d1f;
+                color: #f5f5f7;
+            }
+            #intro-container { background-color: #000000; }
+            #main-title, #main-title span { color: #f5f5f7; }
+            #navbar { background-color: rgba(29, 29, 31, 0.8); }
+            #navbar a { color: #f5f5f7; }
+            #navbar a:hover { color: #2997ff; }
+            .bubble, .product-card, .member-card, #studio-link, #studio-intro {
+                background-color: #2c2c2e;
+                color: #f5f5f7;
+            }
+            .bubble p, .product-card p, .member-card p, #studio-link p, #studio-intro p {
+                color: #a1a1a6;
+            }
+        }
+
+        #intro-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+            z-index: 10;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        #intro-text {
+            display: flex;
+            font-size: 80px;
+            opacity: 0;
+            transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.5s ease-in-out, text-shadow 0.5s ease-in-out;
+            position: relative;
+        }
+
+        #intro-text.glow {
+            background: linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0.7), rgba(255,255,255,0.2));
+            background-size: 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 0 0 16px rgba(255, 255, 255, 0.4);
+            animation: shine 1.5s linear infinite;
+        }
+
+        @keyframes shine {
+            0% { background-position: 200%; }
+            100% { background-position: 0%; }
+        }
+
+        .char-target {
+            width: 150px;
+            height: 150px;
+            margin: 0 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .fallback-text {
+            font-size: 80px;
+            color: #1d1d1f;
+            font-weight: bold;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .fallback-text {
+                color: #f5f5f7;
+            }
+        }
+
+        #navbar {
+            position: fixed;
+            top: -60px;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+            transition: top 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        #navbar ul {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+
+        #navbar li {
+            margin: 0 20px;
+        }
+
+        #navbar a {
+            text-decoration: none;
+            color: #1d1d1f;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+
+        #navbar a:hover {
+            color: #007aff;
+        }
+
+        #main-content {
+            padding-top: 80px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .bubble {
+            background-color: #ffffff;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 60px;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1), transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        .bubble.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #main-title {
+            font-size: 60px;
+            font-family: 'Ma Shan Zheng', cursive;
+            color: #1d1d1f;
+            margin: 0;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        #main-title span {
+            position: relative;
+            display: inline-block;
+        }
+
+        #studio-link, #studio-intro {
+            background-color: #ffffff;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        #studio-link:hover {
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        #studio-link h2, #studio-intro h2 {
+            font-size: 40px;
+            margin-bottom: 20px;
+        }
+
+        .product-grid, .member-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card, .member-card {
+            background-color: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .product-card:hover, .member-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .product-card img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .member-card img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            object-fit: cover;
+        }
+
+        .product-card h3, .member-card h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .product-card p, .member-card p {
+            font-size: 16px;
+            color: #6e6e73;
+            margin-bottom: 15px;
+        }
+
+        .member-card a {
+            text-decoration: none;
+            color: #007aff;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .member-card a:hover {
+            color: #005bb5;
+        }
+    </style>
+</head>
+<body>
+    <div id="intro-container">
+        <div id="intro-text">
+            <div class="fallback-text">无限进步</div>
+        </div>
+    </div>
+
+    <nav id="navbar">
+        <ul>
+            <li><a href="#" onclick="switchPage('/')">首页</a></li>
+            <li><a href="#" onclick="switchPage('/studio')">工作室</a></li>
+            <li><a href="#">产品</a></li>
+            <li><a href="#">联系我们</a></li>
+        </ul>
+    </nav>
+
+    <main id="main-content">
+        <section class="bubble section">
+            <h1 id="main-title">让我们一起，<span id="title-progress">无限进步!</span></h1>
+        </section>
+        <section id="studio-link" class="bubble section" onclick="switchPage('/studio')">
+            <h2>进入 DAK 工作室</h2>
+            <p>探索我们的团队成员和个人博客</p>
+        </section>
+        <section id="product-section" class="bubble section">
+            <h2>探索前沿科技</h2>
+            <div class="product-grid">
+                <div class="product-card">
+                    <img src="https://via.placeholder.com/300x200?text=iPhone+17" alt="iPhone 17">
+                    <h3>iPhone 17</h3>
+                    <p>革命性的设计与性能，重新定义智能手机体验。丝滑的动画和强大的A19芯片，让一切无限进步。</p>
+                </div>
+                <div class="product-card">
+                    <img src="https://via.placeholder.com/300x200?text=GitHub" alt="GitHub">
+                    <h3>GitHub</h3>
+                    <p>全球开发者协作平台，推动开源创新。无缝集成与版本控制，帮助您的项目无限进步。</p>
+                </div>
+                <div class="product-card">
+                    <img src="https://via.placeholder.com/300x200?text=Linux" alt="Linux">
+                    <h3>Linux 系统</h3>
+                    <p>开源操作系统之王，稳定、安全、可定制。从服务器到桌面，推动科技无限进步。</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@latest/dist/hanzi-writer.min.js"></script>
+    <script>
+        const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const strokeColor = isDarkMode ? '#ffffff' : '#000000';
+
+        function switchPage(path) {
+            window.location.hash = path;
+            renderPage();
+        }
+
+        function renderPage() {
+            const path = window.location.hash ? window.location.hash.slice(1) : '/';
+            const introContainer = document.getElementById('intro-container');
+            const navbar = document.getElementById('navbar');
+            const mainContent = document.getElementById('main-content');
+
+            // 回退到主官网默认内容
+            if (path === '/') {
+                // 内容已静态加载，执行动画
+                introContainer.style.display = 'flex';
+                navbar.style.top = '-60px';
+                animateMainPage();
+            } else if (path === '/studio') {
+                // 切换到工作室页面
+                mainContent.innerHTML = `
+                    <section class="bubble section">
+                        <h1 id="main-title">欢迎加入 <span id="title-studio">DAK 工作室!</span></h1>
+                    </section>
+                    <section id="studio-intro" class="bubble section">
+                        <h2>关于 DAK 工作室</h2>
+                        <p>DAK 工作室致力于推动科技与设计的无限进步，我们的团队由一群充满激情的创新者组成，探索前沿技术，打造卓越体验。</p>
+                    </section>
+                    <section id="member-section" class="bubble section">
+                        <h2>我们的成员</h2>
+                        <div class="member-grid">
+                            <div class="member-card" onclick="switchPage('/studio/fantasy-xy808')">
+                                <img src="https://via.placeholder.com/100?text=Fantasy" alt="Fantasy_XY808">
+                                <h3>Fantasy_XY808 (幻梦)</h3>
+                                <p>首席CEO兼董事、开发部部长、设计部副部长</p>
+                                <a href="#" onclick="switchPage('/studio/fantasy-xy808')">访问个人博客</a>
+                            </div>
+                            <div class="member-card" onclick="switchPage('/studio/jyouod')">
+                                <img src="https://via.placeholder.com/100?text=Jyouod" alt="Jyouod">
+                                <h3>Jyouod (玖梦)</h3>
+                                <p>副董事、设计部及宣发部部长</p>
+                                <a href="#" onclick="switchPage('/studio/jyouod')">访问个人博客</a>
+                            </div>
+                        </div>
+                    </section>
+                `;
+                introContainer.style.display = 'flex';
+                navbar.style.top = '-60px';
+                document.getElementById('intro-text').innerHTML = '<div class="fallback-text">DAK 工作室</div>';
+                animateStudioPage();
+            } else if (path.startsWith('/studio/')) {
+                // 博客页面
+                mainContent.innerHTML = `
+                    <section class="bubble section">
+                        <h1 id="main-title">个人博客</h1>
+                    </section>
+                    <section class="bubble section">
+                        <h2>${path.split('/').pop()} 的博客</h2>
+                        <p>欢迎体验 ${path.split('/').pop()} 的个人博客！内容正在建设中...</p>
+                    </section>
+                `;
+                introContainer.style.display = 'none';
+                navbar.style.top = '0';
+                const firstBubble = document.querySelector('.bubble');
+                if (firstBubble) firstBubble.classList.add('visible');
+                const mainTitle = document.getElementById('main-title');
+                if (mainTitle) mainTitle.style.opacity = 1;
+                observeSections();
+            }
+        }
+
+        function animateMainPage() {
+            try {
+                const chars = [
+                    { id: 'char-wu', char: '无' },
+                    { id: 'char-xian', char: '限' },
+                    { id: 'char-jin', char: '进' },
+                    { id: 'char-bu', char: '步' }
+                ];
+
+                document.getElementById('intro-text').innerHTML = '';
+                chars.forEach(c => {
+                    const div = document.createElement('div');
+                    div.id = c.id;
+                    div.className = 'char-target';
+                    document.getElementById('intro-text').appendChild(div);
+                });
+
+                const writers = chars.map(c => HanziWriter.create(c.id, c.char, {
+                    width: 150,
+                    height: 150,
+                    padding: 5,
+                    strokeAnimationSpeed: 2.5,
+                    delayBetweenStrokes: 40,
+                    showOutline: false,
+                    showCharacter: false,
+                    strokeColor: strokeColor
+                }));
+
+                animateChars(writers, 'title-progress', 'product-section');
+            } catch (e) {
+                console.error('Animation failed, fallback to static:', e);
+                fallbackAnimation('title-progress', 'product-section');
+            }
+        }
+
+        function animateStudioPage() {
+            try {
+                const chars = [
+                    { id: 'char-d', char: 'D' },
+                    { id: 'char-a', char: 'A' },
+                    { id: 'char-k', char: 'K' },
+                    { id: 'char-gong', char: '工' },
+                    { id: 'char-zuo', char: '作' },
+                    { id: 'char-shi', char: '室' }
+                ];
+
+                document.getElementById('intro-text').innerHTML = '';
+                chars.forEach(c => {
+                    const div = document.createElement('div');
+                    div.id = c.id;
+                    div.className = 'char-target';
+                    document.getElementById('intro-text').appendChild(div);
+                });
+                const space = document.createElement('div');
+                space.style.width = '50px';
+                document.getElementById('intro-text').appendChild(space);
+
+                const writers = chars.map(c => HanziWriter.create(c.id, c.char, {
+                    width: 150,
+                    height: 150,
+                    padding: 5,
+                    strokeAnimationSpeed: 2.5,
+                    delayBetweenStrokes: 40,
+                    showOutline: false,
+                    showCharacter: false,
+                    strokeColor: strokeColor
+                }));
+
+                animateChars(writers, 'title-studio', 'studio-intro');
+            } catch (e) {
+                console.error('Studio animation failed, fallback to static:', e);
+                fallbackAnimation('title-studio', 'studio-intro');
+            }
+        }
+
+        function animateChars(writers, titleId, scrollTargetId) {
+            let index = 0;
+
+            function animateNext() {
+                if (index >= writers.length) {
+                    document.getElementById('intro-text').classList.add('glow');
+                    setTimeout(() => {
+                        const introText = document.getElementById('intro-text');
+                        const titleTarget = document.getElementById(titleId);
+                        const titleRect = titleTarget.getBoundingClientRect();
+                        const introRect = introText.getBoundingClientRect();
+                        const scale = titleRect.width / (introRect.width * 1.2);
+                        introText.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1), top 0.5s cubic-bezier(0.25, 0.1, 0.25, 1), left 0.5s cubic-bezier(0.25, 0.1, 0.25, 1)';
+                        introText.style.position = 'absolute';
+                        introText.style.transform = `scale(${scale}) translate(-50%, -50%)`;
+                        introText.style.top = `${titleRect.top + window.scrollY + titleRect.height / 2}px`;
+                        introText.style.left = `${titleRect.left + titleRect.width / 2}px`;
+
+                        const firstBubble = document.querySelector('.bubble');
+                        if (firstBubble) firstBubble.classList.add('visible');
+                        const mainTitle = document.getElementById('main-title');
+                        if (mainTitle) mainTitle.style.opacity = 1;
+
+                        setTimeout(() => {
+                            const introContainer = document.getElementById('intro-container');
+                            introContainer.style.opacity = 0;
+                            setTimeout(() => {
+                                introContainer.style.display = 'none';
+                                document.getElementById('navbar').style.top = '0';
+                                const scrollTarget = document.getElementById(scrollTargetId);
+                                if (scrollTarget) {
+                                    window.scrollTo({
+                                        top: scrollTarget.offsetTop,
+                                        behavior: 'smooth'
+                                    });
+                                }
+                            }, 500);
+                        }, 1500);
+                    }, 200);
+                    return;
+                }
+
+                const writer = writers[index];
+                const targetEl = document.getElementById(writers[index].target);
+                if (targetEl) targetEl.style.opacity = 1;
+                writer.animateCharacter({
+                    onComplete: () => {
+                        writer.showCharacter();
+                        index++;
+                        setTimeout(animateNext, 200); // 字间延迟
+                    }
+                });
+            }
+
+            animateNext();
+        }
+
+        function fallbackAnimation(titleId, scrollTargetId) {
+            document.getElementById('intro-text').classList.add('glow');
+            setTimeout(() => {
+                const firstBubble = document.querySelector('.bubble');
+                if (firstBubble) firstBubble.classList.add('visible');
+                const mainTitle = document.getElementById('main-title');
+                if (mainTitle) mainTitle.style.opacity = 1;
+
+                setTimeout(() => {
+                    const introContainer = document.getElementById('intro-container');
+                    introContainer.style.opacity = 0;
+                    setTimeout(() => {
+                        introContainer.style.display = 'none';
+                        document.getElementById('navbar').style.top = '0';
+                        const scrollTarget = document.getElementById(scrollTargetId);
+                        if (scrollTarget) {
+                            window.scrollTo({
+                                top: scrollTarget.offsetTop,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }, 500);
+                }, 1500);
+            }, 200);
+        }
+
+        // 观察器用于内容动画
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        function observeSections() {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => observer.observe(section));
+        }
+
+        // 初始化
+        window.addEventListener('load', () => {
+            renderPage();
+            observeSections();
+        });
+
+        // 监听 hash 变化
+        window.addEventListener('hashchange', renderPage);
+    </script>
+</body>
+</html>
